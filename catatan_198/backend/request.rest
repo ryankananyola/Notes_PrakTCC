@@ -1,0 +1,21 @@
+GET http://localhost:5000/notes
+
+###
+POST http://localhost:5000/add-notes
+Content-Type: application/json
+
+
+{
+    "title": "Dia", "content": "Dia, adalah wanita cantik bernama Ayudia"
+}
+
+###
+PUT http://localhost:5000/update-notes/6
+Content-Type: application/json
+
+{
+    "title": "Aku", "content": "Dia, adalah wanita cantik bernama Ayudya"
+}
+
+###
+DELETE http://localhost:5000/delete-notes/3
