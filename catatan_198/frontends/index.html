@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Catatan</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>Aplikasi Catatan</h1>
+
+    <form id="noteForm">
+        <input type="text" id="title" placeholder="Judul Catatan">
+        <input type="text" id="content" placeholder="Isi Catatan">
+        <button type="submit">Tambah Catatan</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Judul</th>
+                <th>Isi Catatan</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody id="notesContainer">
+            <!-- Data catatan akan muncul di sini -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Popup Edit Form -->
+<div id="editPopup" class="popup">
+    <div class="popup-content">
+        <h3>Edit Catatan</h3>
+        <form id="editForm">
+            <label for="editTitle">Judul:</label>
+            <input type="text" id="editTitle" required><br><br>
+
+            <label for="editContent">Isi:</label>
+            <textarea id="editContent" required></textarea><br><br>
+
+            <button type="submit" class="edit-btn">Edit</button>
+            <button type="button" id="cancelEdit" class="cancel-btn">Batal</button>
+        </form>
+    </div>
+</div>
+
+
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -10,17 +10,6 @@ async function getNote(req, res) {
     }
 }
 
-// // **2. Ambil catatan berdasarkan ID**
-// exports.getNoteById = async (req, res) => {
-//     try {
-//         const note = await Note.findByPk(req.params.id);
-//         if (!note) return res.status(404).json({ message: "Note not found" });
-//         res.json(note);
-//     } catch (error) {
-//         res.status(500).json({ message: error.message });
-//     }
-// };
-
 // Create (Tambah Catatan)
 async function createNote(req, res) {
     try {
