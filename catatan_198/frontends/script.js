@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const editForm = document.getElementById("editForm");
     const cancelEditBtn = document.getElementById("cancelEdit");
     
-    let editingNoteId = null; // Simpan ID catatan yang sedang diedit
+    let editingNoteId = null;
 
     function loadNotes() {
         fetch("http://localhost:5000/notes") 
@@ -90,13 +90,13 @@ document.addEventListener("DOMContentLoaded", function () {
             body: JSON.stringify(updatedNote)
         })
             .then(() => {
-                editPopup.style.display = "none"; // Sembunyikan popup
+                editPopup.style.display = "none";
                 loadNotes();
             });
     });
 
     cancelEditBtn.addEventListener("click", function () {
-        editPopup.style.display = "none"; // Tutup popup tanpa menyimpan
+        editPopup.style.display = "none";
     });
 
     loadNotes();

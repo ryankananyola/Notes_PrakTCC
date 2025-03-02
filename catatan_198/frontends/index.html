@@ -9,11 +9,11 @@
 <body>
 
 <div class="container">
-    <h1>Aplikasi Catatan</h1>
+    <h1>Catatan Ryan</h1>
 
     <form id="noteForm">
-        <input type="text" id="title" placeholder="Judul Catatan">
-        <input type="text" id="content" placeholder="Isi Catatan">
+        <input type="text" id="title" placeholder="Judul Catatan" required>
+        <input type="text" id="content" placeholder="Isi Catatan" required>
         <button type="submit">Tambah Catatan</button>
     </form>
 
@@ -32,6 +32,7 @@
 </div>
 
 <!-- Popup Edit Form -->
+<div id="popupOverlay" class="overlay"></div>
 <div id="editPopup" class="popup">
     <div class="popup-content">
         <h3>Edit Catatan</h3>
@@ -47,8 +48,6 @@
         </form>
     </div>
 </div>
-
-
 
 <script src="script.js"></script>
 </body>
