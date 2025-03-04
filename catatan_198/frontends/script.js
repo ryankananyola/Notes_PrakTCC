@@ -1,103 +1,141 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const form = document.getElementById("noteForm");
-    const titleInput = document.getElementById("title");
-    const contentInput = document.getElementById("content");
-    const notesContainer = document.getElementById("notesContainer");
+const formulir = document.querySelector("#noteForm");
 
-    // Popup Form
-    const editPopup = document.getElementById("editPopup");
-    const editTitleInput = document.getElementById("editTitle");
-    const editContentInput = document.getElementById("editContent");
-    const editForm = document.getElementById("editForm");
-    const cancelEditBtn = document.getElementById("cancelEdit");
-    
-    let editingNoteId = null;
+formulir.addEventListener("submit", (e) => {
+  e.preventDefault();
 
-    function loadNotes() {
-        fetch("http://localhost:5000/notes") 
-            .then(response => response.json())
-            .then(data => {
-                notesContainer.innerHTML = "";
-                data.forEach(note => {
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
-                        <td>${note.title}</td>
-                        <td>${note.content}</td>
-                        <td>
-                            <button class="edit-btn" data-id="${note.id}" data-title="${note.title}" data-content="${note.content}">Edit</button>
-                            <button class="delete-btn" data-id="${note.id}">Hapus</button>
-                        </td>
-                    `;
-                    notesContainer.appendChild(row);
-                });
+  const elemen_title = document.querySelector("#title");
+  const elemen_content = document.querySelector("#content");
 
-                // Event listener untuk tombol Hapus
-                document.querySelectorAll(".delete-btn").forEach(button => {
-                    button.addEventListener("click", function () {
-                        const noteId = this.getAttribute("data-id");
-                        deleteNote(noteId);
-                    });
-                });
+  const title = elemen_title.value.trim();
+  const content = elemen_content.value.trim();
 
-                // Event listener untuk tombol Edit
-                document.querySelectorAll(".edit-btn").forEach(button => {
-                    button.addEventListener("click", function () {
-                        editingNoteId = this.getAttribute("data-id");
-                        editTitleInput.value = this.getAttribute("data-title");
-                        editContentInput.value = this.getAttribute("data-content");
-                        editPopup.style.display = "block"; // Tampilkan popup
-                    });
-                });
-            })
-            .catch(error => console.error("Error:", error));
-    }
+  if (!title || !content) {
+    alert("Judul dan isi catatan tidak boleh kosong!");
+    return;
+  }
 
-    form.addEventListener("submit", function (event) {
-        event.preventDefault();
-        const newNote = {
-            title: titleInput.value,
-            content: contentInput.value
-        };
+  const id = elemen_title.dataset.id || ""; 
 
-        fetch("http://localhost:5000/add-notes", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(newNote)
-        })
-            .then(response => response.json())
-            .then(() => {
-                titleInput.value = "";
-                contentInput.value = "";
-                loadNotes();
-            });
-    });
-
-    function deleteNote(id) {
-        fetch(`http://localhost:5000/delete-notes/${id}`, { method: "DELETE" })
-            .then(() => loadNotes());
-    }
-
-    editForm.addEventListener("submit", function (event) {
-        event.preventDefault();
-        const updatedNote = {
-            title: editTitleInput.value,
-            content: editContentInput.value
-        };
-
-        fetch(`http://localhost:5000/update-notes/${editingNoteId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(updatedNote)
-        })
-            .then(() => {
-                editPopup.style.display = "none";
-                loadNotes();
-            });
-    });
-
-    cancelEditBtn.addEventListener("click", function () {
-        editPopup.style.display = "none";
-    });
-
-    loadNotes();
+  if (id === "") {
+    axios
+      .post("http://localhost:5000/add-notes", { title, content })
+      .then(() => {
+        elemen_title.value = "";
+        elemen_content.value = "";
+        getNotes();
+      })
+      .catch((error) => console.log(error.message));
+  } else {
+    axios
+      .put(`http://localhost:5000/update-notes/${id}`, { title, content })
+      .then(() => {
+        elemen_title.dataset.id = "";
+        elemen_title.value = "";
+        elemen_content.value = "";
+        getNotes();
+      })
+      .catch((error) => console.log(error));
+  }
 });
+
+async function getNotes() {
+  try {
+    const { data } = await axios.get("http://localhost:5000/notes");
+    const table = document.querySelector("#notesContainer");
+    let tampilan = "";
+    let no = 1;
+
+    data.forEach((note) => {
+      tampilan += tampilkanNote(no, note);
+      no++;
+    });
+
+    table.innerHTML = tampilan;
+    hapusNote();
+    editNote();
+  } catch (error) {
+    console.log(error.message);
+  }
+}
+
+function tampilkanNote(no, note) {
+  return `
+    <tr>
+      <td>${note.id}</td>
+      <td>${note.title}</td>
+      <td>${note.content}</td>
+      <td>
+        <button data-id="${note.id}" class='btn-edit btn-warning'>Edit</button>
+        <button data-id="${note.id}" class='btn-hapus btn-danger'>Hapus</button>
+      </td>
+    </tr>
+  `;
+}
+
+function hapusNote() {
+  document.querySelectorAll(".btn-hapus").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.id;
+      axios
+        .delete(`http://localhost:5000/delete-notes/${id}`)
+        .then(() => getNotes())
+        .catch((error) => console.log(error));
+    });
+  });
+}
+
+function editNote() {
+  document.querySelectorAll(".btn-edit").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.id;
+      const title = btn.closest("tr").children[1].textContent;
+      const content = btn.closest("tr").children[2].textContent;
+
+      document.querySelector("#editId").value = id;
+      document.querySelector("#editTitle").value = title;
+      document.querySelector("#editContent").value = content;
+
+      document.querySelector("#editPopup").style.display = "block";
+      document.querySelector("#popupOverlay").style.display = "block";
+    });
+  });
+}
+
+const editForm = document.querySelector("#editForm");
+editForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const id = document.querySelector("#editId").value;
+  const title = document.querySelector("#editTitle").value.trim();
+  const content = document.querySelector("#editContent").value.trim();
+
+  if (!title || !content) {
+    alert("Judul dan isi catatan tidak boleh kosong!");
+    return;
+  }
+
+  try {
+    await axios.put(`http://localhost:5000/update-notes/${id}`, { title, content });
+
+    document.querySelector("#editPopup").style.display = "none";
+    document.querySelector("#popupOverlay").style.display = "none";
+
+    getNotes();
+  } catch (error) {
+    console.error(error);
+    alert("Terjadi kesalahan saat mengupdate catatan.");
+  }
+});
+
+const cancelEditBtn = document.querySelector("#cancelEdit");
+cancelEditBtn.addEventListener("click", () => {
+  document.querySelector("#editPopup").style.display = "none";
+  document.querySelector("#popupOverlay").style.display = "none";
+});
+
+document.querySelector("#popupOverlay").addEventListener("click", () => {
+  document.querySelector("#editPopup").style.display = "none";
+  document.querySelector("#popupOverlay").style.display = "none";
+});
+
+getNotes();
